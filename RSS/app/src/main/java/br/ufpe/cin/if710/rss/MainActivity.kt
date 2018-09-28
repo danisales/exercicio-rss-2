@@ -17,6 +17,7 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 
+import android.content.Intent
 
 class MainActivity : Activity() {
     lateinit var prefs: SharedPreferences
@@ -39,6 +40,10 @@ class MainActivity : Activity() {
 
         prefs = getSharedPreferences ("RSS_PREF", 0)
         rssLink = prefs.getString("rssfeed", getString(R.string.rssfeed))
+
+        btnRssPreferences.setOnClickListener {
+            startActivity(Intent(applicationContext, PrefsMenuActivity::class.java))
+        }
     }
 
     override fun onStart() {
