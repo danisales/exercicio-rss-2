@@ -1,6 +1,7 @@
 package br.ufpe.cin.if710.rss
 
 import android.app.Activity
+import android.content.SharedPreferences
 import android.os.Bundle
 
 import org.jetbrains.anko.doAsync
@@ -18,6 +19,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : Activity() {
+    lateinit var prefs: SharedPreferences
+    var rssLink: String = ""
 
     //OUTROS LINKS PARA TESTAR...
     //http://rss.cnn.com/rss/edition.rss
@@ -31,13 +34,16 @@ class MainActivity : Activity() {
 
         conteudoRSS.layoutManager = LinearLayoutManager(this)
         conteudoRSS.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+
+        prefs = getSharedPreferences ("RSS_PREF", 0)
+        rssLink = prefs.getString("rssfeed", getString(R.string.rssfeed))
     }
 
     override fun onStart() {
         super.onStart()
         doAsync {
             try {
-                val feedXML = getRssFeed(getString(R.string.rssfeed))
+                val feedXML = getRssFeed(rssLink)
                 uiThread {
                     // Define adapter
                     conteudoRSS.adapter = ItemRSSAdapter(ParserRSS.parse(feedXML), this@MainActivity)
