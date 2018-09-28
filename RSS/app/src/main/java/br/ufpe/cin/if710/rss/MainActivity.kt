@@ -35,6 +35,8 @@ class MainActivity : Activity() {
         conteudoRSS.layoutManager = LinearLayoutManager(this)
         conteudoRSS.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
 
+
+
         prefs = getSharedPreferences ("RSS_PREF", 0)
         rssLink = prefs.getString("rssfeed", getString(R.string.rssfeed))
     }
