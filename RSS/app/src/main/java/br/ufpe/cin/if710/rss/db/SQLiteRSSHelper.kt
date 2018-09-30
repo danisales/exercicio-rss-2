@@ -1,5 +1,7 @@
 package br.ufpe.cin.if710.rss.db
 
+import android.content.ClipData
+import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.SQLException
@@ -32,20 +34,47 @@ class SQLiteRSSHelper private constructor(//alternativa
     }
 
     fun insertItem(title: String, pubDate: String, description: String, link: String): Long {
-        return 0.0.toLong()
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put(ITEM_TITLE, title)
+        values.put(ITEM_DATE, pubDate)
+        values.put(ITEM_DESC, description)
+        values.put(ITEM_LINK, link)
+        values.put(ITEM_UNREAD, true)
+        return db.insert(DATABASE_TABLE, null, values)
     }
 
     @Throws(SQLException::class)
-    fun getItemRSS(link: String): ItemRSS {
-        return ItemRSS("FALTA IMPLEMENTAR", "FALTA IMPLEMENTAR", "2018-04-09", "FALTA IMPLEMENTAR")
+    fun getItemRSS(link: String): ItemRSS? {
+        var item: ItemRSS? = null
+        val db = this.writableDatabase
+        val query = "SELECT * FROM $DATABASE_TABLE WHERE $ITEM_LINK = $link AND $ITEM_UNREAD = 1"
+        val cursor = db.rawQuery(query, null)
+        if(cursor != null) {
+            cursor.moveToFirst()
+            while(cursor.moveToNext()) {
+                val title = cursor.getString(cursor.getColumnIndex(ITEM_TITLE))
+                val link = cursor.getString(cursor.getColumnIndex(ITEM_LINK))
+                val pubDate = cursor.getString(cursor.getColumnIndex(ITEM_DATE))
+                val description = cursor.getString(cursor.getColumnIndex(ITEM_DESC))
+                item = ItemRSS(title, link, pubDate, description)
+            }
+        }
+        return item
     }
 
     fun markAsUnread(link: String): Boolean {
-        return false
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put(ITEM_UNREAD, true)
+        return db.update(DATABASE_TABLE, values,"$ITEM_LINK='$link'", null) > 0
     }
 
     fun markAsRead(link: String): Boolean {
-        return false
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put(ITEM_UNREAD, false)
+        return db.update(DATABASE_TABLE, values,"$ITEM_LINK='$link'", null) > 0
     }
 
     companion object {

@@ -18,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 
 import android.content.Intent
+import android.preference.PreferenceManager
 
 class MainActivity : Activity() {
     lateinit var prefs: SharedPreferences
@@ -36,20 +37,19 @@ class MainActivity : Activity() {
         conteudoRSS.layoutManager = LinearLayoutManager(this)
         conteudoRSS.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
 
-
-
-        prefs = getSharedPreferences ("RSS_PREF", 0)
-        rssLink = prefs.getString("rssfeed", getString(R.string.rssfeed))
+        prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        rssLink = prefs.getString(RSSFEED, getString(R.string.rssfeed))
 
         btnRssPreferences.setOnClickListener {
             startActivity(Intent(applicationContext, PrefsMenuActivity::class.java))
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onResume() {
+        super.onResume()
         doAsync {
             try {
+                rssLink = prefs.getString("rssfeed", getString(R.string.rssfeed))
                 val feedXML = getRssFeed(rssLink)
                 uiThread {
                     // Define adapter
@@ -83,5 +83,9 @@ class MainActivity : Activity() {
             `in`?.close()
         }
         return rssFeed
+    }
+
+    companion object {
+        val RSSFEED = "rssfeed"
     }
 }

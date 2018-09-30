@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import kotlinx.android.synthetic.main.itemlista.view.*
 import android.content.Intent
 import android.net.Uri
+import br.ufpe.cin.if710.rss.db.SQLiteRSSHelper
 
 class ItemRSSAdapter(private val items: List<ItemRSS>, private val c : Context)
     : RecyclerView.Adapter<ItemRSSAdapter.ViewHolder>(){
@@ -26,7 +27,11 @@ class ItemRSSAdapter(private val items: List<ItemRSS>, private val c : Context)
         holder?.title?.text = i.title
         holder?.pubDate?.text = i.pubDate
         // Abre link no browser ao clicar em um item
-        holder?.itemView.setOnClickListener(){ openLink(i.link) }
+        holder?.itemView.setOnClickListener(){
+            openLink(i.link)
+            // Atualiza DB para marcar notícia como lida
+            SQLiteRSSHelper.getInstance(c).markAsRead(i.link)
+        }
     }
 
     private fun openLink(url: String){
